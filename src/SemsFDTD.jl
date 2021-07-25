@@ -44,8 +44,32 @@ struct SimData
     abc_zp1_ty::AbstractArray{Float64,2}
 end
 
+# freespace impedance
+vacuumZ = 376.730314 # ohms
 
-function new_sim( dim_x::UInt32, dim_y::UInt32, dim_z::UInt32 )::SimData
+# Courant limit in 3d space is 1/sqrt(3)
+courant_limit = 1.0 / sqrt( 3.0 );
+
+# first order ABC coefficient
+abc_coeff = ( courant_limit - 1.0 ) / ( courant_limit + 1.0 )
+
+# speed of light
+c = 299792458
+
+"""
+    approx_stepsize - Give the approximate discrete spatial and time step sizes
+    for a given minimum wavelength
+"""
+function approx_stepsize( min_wavelength::Float64 )
+    delta_s = min_wavelength / 20
+    delta_t = ( delta_s * courant_limit ) / c;
+    return ( delta_s, delta_t )
+end
+
+"""
+    new_sim - construct and initialize a new simulation assuming
+"""
+function new_sim( dim_x::Int, dim_y::Int, dim_z::Int )::SimData
     newsim = SimData( zeros( dim_x - 1, dim_y, dim_z ), # e_x
                       zeros( dim_x, dim_y - 1, dim_z ), # e_y
                       zeros( dim_x, dim_y, dim_z - 1 ), # e_z
@@ -77,11 +101,11 @@ function new_sim( dim_x::UInt32, dim_y::UInt32, dim_z::UInt32 )::SimData
                       zeros( dim_x - 1, dim_y ), # abc_zp1_tx
                       zeros( dim_x, dim_y - 1 ) ) # abc_zp1_ty
 
-    # free space impedance
-    fsi = 
     # initialize e-field coefficients to free space for now
     newsim.coeff_e_xe .= 1.0
-    newsim.coeff_e_xh = courantlimit * fsi
+    newsim.coeff_e_xh .= courant_limit * vacuumZ
+
+    return newsim
 end
 
 """
@@ -103,19 +127,27 @@ function enforce_abc()
 end
 
 """
-    enforce_pec -
+    enforce_pec - apply zero electric field (PEC) to specified regions
+        region argument expected in form of [ [ 1:2, 2:3, 3:4 ], [ 5:6, 7:8, 9:10 ] ]
 """
-function enforce_pec()
+function enforce_pec( sim::SimData, regions::Vector{Vector{UnitRange{Int64}}} )
+    for region in regions
+        sim.e_x( region ) .= 0.0
+        sim.e_y( region ) .= 0.0
+        sim.e_z( region ) .= 0.0
+    end
 end
 
 """
     apply_source_node -
+        TODO: does this make sense as a function
 """
 function apply_source_node()
 end
 
 """
     apply_array_nodes -
+        TODO: does this make sense as a function
 """
 function apply_array_nodes()
 end
