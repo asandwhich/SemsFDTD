@@ -1,5 +1,10 @@
 module SemsFDTD
 
+export SimData
+export approx_stepsize
+export new_sim
+export timestep
+
 """
     SimData
 
@@ -146,32 +151,35 @@ end
 """
 function update_h_field( sim::SimData )
     # x component
-    sim.h_x[ :, begin : end - 1, begin : end - 1 ] =
-        sim.coeff_h_xh[ :, begin : end - 1, begin : end - 1 ] .*
-        sim.h_x[ :, begin : end - 1, begin : end - 1 ] .+
-        sim.coeff_h_xe[ :, begin: end - 1, begin: end - 1 ] .*
-        ( ( sim.e_y[ :, begin : end - 1, begin + 1 : end ]
-          - sim.e_y[ :, begin : end - 1, begin : end - 1 ] )
-        - ( sim.e_z[ :, begin + 1 : end, begin : end - 1 ] 
-          - sim.e_z[ :, begin : end - 1, begin : end - 1 ] ) )
+    # sim.h_x[ :, begin : end - 1, begin : end - 1 ] =
+    #     ( sim.coeff_h_xh[ :, begin : end - 1, begin : end - 1 ] .*
+    #     sim.h_x[ :, begin : end - 1, begin : end - 1 ] ) .+
+    #     sim.coeff_h_xe[ :, begin: end - 1, begin: end - 1 ] .*
+    #     ( ( sim.e_y[ :, begin : end - 1, begin + 1 : end ]
+    #       .- sim.e_y[ :, begin : end - 1, begin : end - 1 ] )
+    #     .- ( sim.e_z[ :, begin + 1 : end, begin : end - 1 ] 
+    #       .- sim.e_z[ :, begin : end - 1, begin : end - 1 ] ) )
+    sim.h_x[:] = ( sim.coeff_h_xh .* sim.h_x ) .+ sim.coeff_h_xe .*
+        ( ( sim.e_y[ :, :, begin + 1 : end ] .- sim.e_y[ :, :, begin : end - 1 ] )
+        .- ( sim.e_z[ :, begin + 1 : end, : ] .- sim.e_z[ :, begin : end - 1, : ] ) )
     # y component
     sim.h_y[ begin : end - 1, :, begin : end - 1 ] =
         sim.coeff_h_yh[ begin : end - 1, :, begin : end - 1 ] .*
         sim.h_y[ begin : end - 1, :, begin : end - 1 ] .+
         sim.coeff_h_ye[ begin : end - 1, :, begin : end - 1 ] .*
         ( ( sim.e_z[ begin + 1 : end, :, begin : end - 1 ]
-          - sim.e_z[ begin : end - 1, :, begin : end - 1 ] )
-        - ( sim.e_x[ begin : end - 1, :, begin + 1 : end ]
-          - sim.e_x[ begin : end - 1, :, begin : end - 1 ] ) )
+          .- sim.e_z[ begin : end - 1, :, begin : end - 1 ] )
+        .- ( sim.e_x[ begin : end - 1, :, begin + 1 : end ]
+          .- sim.e_x[ begin : end - 1, :, begin : end - 1 ] ) )
     # z component
     sim.h_z[ begin : end - 1, begin : end - 1, : ] =
         sim.coeff_h_zh[ begin : end - 1, begin : end - 1, : ] .*
         sim.h_z[ begin : end - 1, begin : end - 1, : ] .+
         sim.coeff_h_ze[ begin : end - 1, begin : end - 1, : ] .*
         ( ( sim.e_x[ begin : end - 1, begin + 1 : end, : ]
-          - sim.e_x[ begin : end - 1, begin : end - 1, : ] )
-        - ( sim.e_y[ begin + 1 : end, begin : end - 1, : ]
-          - sim.e_y[ begin : end - 1, begin : end - 1, : ] ) )
+          .- sim.e_x[ begin : end - 1, begin : end - 1, : ] )
+        .- ( sim.e_y[ begin + 1 : end, begin : end - 1, : ]
+          .- sim.e_y[ begin : end - 1, begin : end - 1, : ] ) )
 end
 
 """
@@ -252,10 +260,10 @@ end
 function apply_array_nodes()
 end
 
-function __init__()
-    print( "test" )
-
-    tst = new_sim( 400, 400, 400 )
-end
+# function __init__()
+#     print( "test" )
+# 
+#     tst = new_sim( 400, 400, 400 )
+# end
 
 end # module
