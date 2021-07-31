@@ -10,43 +10,43 @@ export timestep
 
     Struct containing the matrices required to run the FDTD simulation
 """
-struct SimData
-    e_x::AbstractArray{Float64,3}
-    e_y::AbstractArray{Float64,3}
-    e_z::AbstractArray{Float64,3}
+struct SimData{T<:AbstractFloat}
+    e_x::AbstractArray{T,3}
+    e_y::AbstractArray{T,3}
+    e_z::AbstractArray{T,3}
     # H field definitions
-    h_x::AbstractArray{Float64,3}
-    h_y::AbstractArray{Float64,3}
-    h_z::AbstractArray{Float64,3}
+    h_x::AbstractArray{T,3}
+    h_y::AbstractArray{T,3}
+    h_z::AbstractArray{T,3}
     # E field coefficients
-    coeff_e_xe::AbstractArray{Float64,3}
-    coeff_e_xh::AbstractArray{Float64,3}
-    coeff_e_ye::AbstractArray{Float64,3}
-    coeff_e_yh::AbstractArray{Float64,3}
-    coeff_e_ze::AbstractArray{Float64,3}
-    coeff_e_zh::AbstractArray{Float64,3}
+    coeff_e_xe::AbstractArray{T,3}
+    coeff_e_xh::AbstractArray{T,3}
+    coeff_e_ye::AbstractArray{T,3}
+    coeff_e_yh::AbstractArray{T,3}
+    coeff_e_ze::AbstractArray{T,3}
+    coeff_e_zh::AbstractArray{T,3}
     # H field coefficients
-    coeff_h_xe::AbstractArray{Float64,3}
-    coeff_h_xh::AbstractArray{Float64,3}
-    coeff_h_ye::AbstractArray{Float64,3}
-    coeff_h_yh::AbstractArray{Float64,3}
-    coeff_h_ze::AbstractArray{Float64,3}
-    coeff_h_zh::AbstractArray{Float64,3}
+    coeff_h_xe::AbstractArray{T,3}
+    coeff_h_xh::AbstractArray{T,3}
+    coeff_h_ye::AbstractArray{T,3}
+    coeff_h_yh::AbstractArray{T,3}
+    coeff_h_ze::AbstractArray{T,3}
+    coeff_h_zh::AbstractArray{T,3}
     # ABC X axis Planes
-    abc_xp0_ty::AbstractArray{Float64,2}
-    abc_xp0_tz::AbstractArray{Float64,2}
-    abc_xp1_ty::AbstractArray{Float64,2}
-    abc_xp1_tz::AbstractArray{Float64,2}
+    abc_xp0_ty::AbstractArray{T,2}
+    abc_xp0_tz::AbstractArray{T,2}
+    abc_xp1_ty::AbstractArray{T,2}
+    abc_xp1_tz::AbstractArray{T,2}
     # ABC Y axis Planes
-    abc_yp0_tx::AbstractArray{Float64,2}
-    abc_yp0_tz::AbstractArray{Float64,2}
-    abc_yp1_tx::AbstractArray{Float64,2}
-    abc_yp1_tz::AbstractArray{Float64,2}
+    abc_yp0_tx::AbstractArray{T,2}
+    abc_yp0_tz::AbstractArray{T,2}
+    abc_yp1_tx::AbstractArray{T,2}
+    abc_yp1_tz::AbstractArray{T,2}
     # ABC Z axis planes
-    abc_zp0_tx::AbstractArray{Float64,2}
-    abc_zp0_ty::AbstractArray{Float64,2}
-    abc_zp1_tx::AbstractArray{Float64,2}
-    abc_zp1_ty::AbstractArray{Float64,2}
+    abc_zp0_tx::AbstractArray{T,2}
+    abc_zp0_ty::AbstractArray{T,2}
+    abc_zp1_tx::AbstractArray{T,2}
+    abc_zp1_ty::AbstractArray{T,2}
 end
 
 # freespace impedance
@@ -74,37 +74,37 @@ end
 """
     new_sim - construct and initialize a new simulation assuming
 """
-function new_sim( dim_x::Int, dim_y::Int, dim_z::Int )::SimData
-    newsim = SimData( zeros( dim_x - 1, dim_y, dim_z ), # e_x
-                      zeros( dim_x, dim_y - 1, dim_z ), # e_y
-                      zeros( dim_x, dim_y, dim_z - 1 ), # e_z
-                      zeros( dim_x, dim_y - 1, dim_z - 1 ), # h_x
-                      zeros( dim_x - 1, dim_y, dim_z - 1 ), # h_y
-                      zeros( dim_x - 1, dim_y - 1, dim_z ), # h_z
-                      zeros( dim_x - 1, dim_y, dim_z ), # coeff_e_xe
-                      zeros( dim_x - 1, dim_y, dim_z ), # coeff_e_xh
-                      zeros( dim_x, dim_y - 1, dim_z ), # coeff_e_ye
-                      zeros( dim_x, dim_y - 1, dim_z ), # coeff_e_yh
-                      zeros( dim_x, dim_y, dim_z - 1 ), # coeff_e_ze
-                      zeros( dim_x, dim_y, dim_z - 1 ), # coeff_e_zh
-                      zeros( dim_x, dim_y - 1, dim_z - 1 ), # coeff_h_xe
-                      zeros( dim_x, dim_y - 1, dim_z - 1 ), # coeff_h_xh
-                      zeros( dim_x - 1, dim_y, dim_z - 1 ), # coeff_h_ye
-                      zeros( dim_x - 1, dim_y, dim_z - 1 ), # coeff_h_yh
-                      zeros( dim_x - 1, dim_y - 1, dim_z ), # coeff_h_ze
-                      zeros( dim_x - 1, dim_y - 1, dim_z ), # coeff_h_zh
-                      zeros( dim_y - 1, dim_z ), # abc_xp0_ty
-                      zeros( dim_y, dim_z - 1 ), # abc_xp0_tz
-                      zeros( dim_y - 1, dim_z ), # abc_xp1_ty
-                      zeros( dim_y, dim_z - 1 ), # abc_xp1_tz
-                      zeros( dim_x - 1, dim_z ), # abc_yp0_tx
-                      zeros( dim_x, dim_z - 1 ), # abc_yp0_tz
-                      zeros( dim_x - 1, dim_z ), # abc_yp1_tx
-                      zeros( dim_x, dim_z - 1 ), # abc_yp1_tz
-                      zeros( dim_x - 1, dim_y ), # abc_zp0_tx
-                      zeros( dim_x, dim_y - 1 ), # abc_zp0_ty
-                      zeros( dim_x - 1, dim_y ), # abc_zp1_tx
-                      zeros( dim_x, dim_y - 1 ) ) # abc_zp1_ty
+function new_sim( fprecision::DataType, dim_x::Int, dim_y::Int, dim_z::Int )::SimData
+    newsim = SimData( zeros( fprecision, dim_x - 1, dim_y, dim_z ), # e_x
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z ), # e_y
+                      zeros( fprecision, dim_x, dim_y, dim_z - 1 ), # e_z
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z - 1 ), # h_x
+                      zeros( fprecision, dim_x - 1, dim_y, dim_z - 1 ), # h_y
+                      zeros( fprecision, dim_x - 1, dim_y - 1, dim_z ), # h_z
+                      zeros( fprecision, dim_x - 1, dim_y, dim_z ), # coeff_e_xe
+                      zeros( fprecision, dim_x - 1, dim_y, dim_z ), # coeff_e_xh
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z ), # coeff_e_ye
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z ), # coeff_e_yh
+                      zeros( fprecision, dim_x, dim_y, dim_z - 1 ), # coeff_e_ze
+                      zeros( fprecision, dim_x, dim_y, dim_z - 1 ), # coeff_e_zh
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z - 1 ), # coeff_h_xe
+                      zeros( fprecision, dim_x, dim_y - 1, dim_z - 1 ), # coeff_h_xh
+                      zeros( fprecision, dim_x - 1, dim_y, dim_z - 1 ), # coeff_h_ye
+                      zeros( fprecision, dim_x - 1, dim_y, dim_z - 1 ), # coeff_h_yh
+                      zeros( fprecision, dim_x - 1, dim_y - 1, dim_z ), # coeff_h_ze
+                      zeros( fprecision, dim_x - 1, dim_y - 1, dim_z ), # coeff_h_zh
+                      zeros( fprecision, dim_y - 1, dim_z ), # abc_xp0_ty
+                      zeros( fprecision, dim_y, dim_z - 1 ), # abc_xp0_tz
+                      zeros( fprecision, dim_y - 1, dim_z ), # abc_xp1_ty
+                      zeros( fprecision, dim_y, dim_z - 1 ), # abc_xp1_tz
+                      zeros( fprecision, dim_x - 1, dim_z ), # abc_yp0_tx
+                      zeros( fprecision, dim_x, dim_z - 1 ), # abc_yp0_tz
+                      zeros( fprecision, dim_x - 1, dim_z ), # abc_yp1_tx
+                      zeros( fprecision, dim_x, dim_z - 1 ), # abc_yp1_tz
+                      zeros( fprecision, dim_x - 1, dim_y ), # abc_zp0_tx
+                      zeros( fprecision, dim_x, dim_y - 1 ), # abc_zp0_ty
+                      zeros( fprecision, dim_x - 1, dim_y ), # abc_zp1_tx
+                      zeros( fprecision, dim_x, dim_y - 1 ) ) # abc_zp1_ty
 
     # initialize e-field coefficients to free space for now
     newsim.coeff_e_xe .= 1.0

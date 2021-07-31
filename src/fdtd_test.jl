@@ -1,7 +1,7 @@
 
 include( "SemsFDTD.jl" )
 
-testsim = SemsFDTD.new_sim( 60, 60, 60 )
+testsim = SemsFDTD.new_sim( Float32, 400, 400, 400 )
 
 SemsFDTD.timestep( testsim )
 
