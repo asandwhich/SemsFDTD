@@ -161,7 +161,7 @@ function update_h_field( sim::SimData )
         ( ( sim.e_z[ begin + 1 : end, :, : ] .- sim.e_z[ begin : end - 1, :, : ] )
         .- ( sim.e_x[ :, :, begin + 1 : end ] .- sim.e_x[ :, :, begin : end - 1 ] ) )
     # z component
-    sim.h_y[:] = ( sim.coeff_h_zh .* sim.h_z ) .+ sim.coeff_h_ze .*
+    sim.h_z[:] = ( sim.coeff_h_zh .* sim.h_z ) .+ sim.coeff_h_ze .*
         ( ( sim.e_x[ :, begin + 1 : end, : ] .- sim.e_x[ :, begin : end - 1, : ] )
         .- ( sim.e_y[ begin + 1 : end, :, : ] .- sim.e_y[ begin : end - 1, :, : ] ) )
 
