@@ -118,32 +118,34 @@ end
 """
 function update_e_field( sim::SimData )
     # x component
-    sim.e_x[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ] =
-        sim.coeff_e_xe[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ] .*
-        sim.e_x[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ] .+
-        sim.coeff_e_xh[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ] .*
-        ( ( sim.h_z[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ]
-          .- sim.h_z[ begin : end - 1, begin : end - 2, begin + 1 : end - 1 ] )
-        .- ( sim.h_y[ begin : end - 1, begin + 1 : end - 1, begin + 1 : end - 1 ]
-          .- sim.h_y[ begin : end - 1, begin + 1 : end - 1, begin : end - 2 ] ) )
+    sim.e_x[ :, begin + 1 : end - 1, begin + 1 : end - 1 ] =
+        ( sim.coeff_e_xe[ :, begin + 1 : end - 1, begin + 1 : end - 1 ] .*
+          sim.e_x[ :, begin + 1 : end - 1, begin + 1 : end - 1 ] ) .+
+        sim.coeff_e_xh[ :, begin + 1 : end - 1, begin + 1 : end - 1 ] .*
+        ( ( sim.h_z[ :, begin + 1 : end, begin + 1 : end - 1 ]
+         .- sim.h_z[ :, begin : end - 1, begin + 1 : end - 1 ] )
+        .- ( sim.h_y[ :, begin + 1 : end - 1, begin + 1 : end ]
+          .- sim.h_y[ :, begin + 1 : end - 1, begin : end - 1 ] ) )
     # y component
-    sim.e_y[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ] =
-        sim.coeff_e_ye[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ] .*
-        sim.e_y[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ] .+
-        sim.coeff_e_yh[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ] .*
-        ( ( sim.h_x[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ]
-          .- sim.h_x[ begin + 1 : end - 1, begin : end - 1, begin : end - 2 ] )
-        .- ( sim.h_z[ begin + 1 : end - 1, begin : end - 1, begin + 1 : end - 1 ]
-          .- sim.h_z[ begin : end - 2, begin : end - 1, begin + 1 : end - 1 ] ) )
+    sim.e_y[ begin + 1 : end - 1, :, begin + 1 : end - 1 ] =
+        ( sim.coeff_e_ye[ begin + 1 : end - 1, :, begin + 1 : end - 1 ] .*
+          sim.e_y[ begin + 1 : end - 1, :, begin + 1 : end - 1 ] ) .+
+        sim.coeff_e_yh[ begin + 1 : end - 1, :, begin + 1 : end - 1 ] .*
+        ( ( sim.h_x[ begin + 1 : end - 1, :, begin + 1 : end ]
+         .- sim.h_x[ begin + 1 : end - 1, :, begin : end - 1 ] )
+        .- ( sim.h_z[ begin + 1 : end, :, begin + 1 : end - 1 ]
+          .- sim.h_z[ begin : end - 1, :, begin + 1 : end - 1 ] ) )
     # z component
-    sim.e_z[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ] =
-        sim.coeff_e_ze[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ] .*
-        sim.e_z[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ] .+
-        sim.coeff_e_zh[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ] .*
-        ( ( sim.h_y[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ]
-          .- sim.h_y[ begin : end - 2, begin + 1 : end - 1, begin : end - 1 ] )
-        .- ( sim.h_x[ begin + 1 : end - 1, begin + 1 : end - 1, begin : end - 1 ]
-          .- sim.h_x[ begin + 1 : end - 1, begin : end - 2, begin : end - 1 ] ) )
+    sim.e_z[ begin + 1 : end - 1, begin + 1 : end - 1, : ] =
+        ( sim.coeff_e_ze[ begin + 1 : end - 1, begin + 1 : end - 1, : ] .*
+          sim.e_z[ begin + 1 : end - 1, begin + 1 : end - 1, : ] ) .+
+        sim.coeff_e_zh[  begin + 1 : end - 1, begin + 1 : end - 1, : ] .*
+        ( ( sim.h_y[ begin + 1 : end, begin + 1 : end - 1, : ]
+         .- sim.h_y[ begin : end - 1, begin + 1 : end - 1, : ] )
+        .- ( sim.h_x[ begin + 1 : end - 1, begin + 1 : end, : ]
+          .- sim.h_x[ begin + 1 : end - 1, begin : end - 1, : ] ) )
+
+    return nothing
 end
 
 """
@@ -151,35 +153,19 @@ end
 """
 function update_h_field( sim::SimData )
     # x component
-    # sim.h_x[ :, begin : end - 1, begin : end - 1 ] =
-    #     ( sim.coeff_h_xh[ :, begin : end - 1, begin : end - 1 ] .*
-    #     sim.h_x[ :, begin : end - 1, begin : end - 1 ] ) .+
-    #     sim.coeff_h_xe[ :, begin: end - 1, begin: end - 1 ] .*
-    #     ( ( sim.e_y[ :, begin : end - 1, begin + 1 : end ]
-    #       .- sim.e_y[ :, begin : end - 1, begin : end - 1 ] )
-    #     .- ( sim.e_z[ :, begin + 1 : end, begin : end - 1 ] 
-    #       .- sim.e_z[ :, begin : end - 1, begin : end - 1 ] ) )
     sim.h_x[:] = ( sim.coeff_h_xh .* sim.h_x ) .+ sim.coeff_h_xe .*
         ( ( sim.e_y[ :, :, begin + 1 : end ] .- sim.e_y[ :, :, begin : end - 1 ] )
         .- ( sim.e_z[ :, begin + 1 : end, : ] .- sim.e_z[ :, begin : end - 1, : ] ) )
     # y component
-    sim.h_y[ begin : end - 1, :, begin : end - 1 ] =
-        sim.coeff_h_yh[ begin : end - 1, :, begin : end - 1 ] .*
-        sim.h_y[ begin : end - 1, :, begin : end - 1 ] .+
-        sim.coeff_h_ye[ begin : end - 1, :, begin : end - 1 ] .*
-        ( ( sim.e_z[ begin + 1 : end, :, begin : end - 1 ]
-          .- sim.e_z[ begin : end - 1, :, begin : end - 1 ] )
-        .- ( sim.e_x[ begin : end - 1, :, begin + 1 : end ]
-          .- sim.e_x[ begin : end - 1, :, begin : end - 1 ] ) )
+    sim.h_y[:] = ( sim.coeff_h_yh .* sim.h_y ) .+ sim.coeff_h_ye .*
+        ( ( sim.e_z[ begin + 1 : end, :, : ] .- sim.e_z[ begin : end - 1, :, : ] )
+        .- ( sim.e_x[ :, :, begin + 1 : end ] .- sim.e_x[ :, :, begin : end - 1 ] ) )
     # z component
-    sim.h_z[ begin : end - 1, begin : end - 1, : ] =
-        sim.coeff_h_zh[ begin : end - 1, begin : end - 1, : ] .*
-        sim.h_z[ begin : end - 1, begin : end - 1, : ] .+
-        sim.coeff_h_ze[ begin : end - 1, begin : end - 1, : ] .*
-        ( ( sim.e_x[ begin : end - 1, begin + 1 : end, : ]
-          .- sim.e_x[ begin : end - 1, begin : end - 1, : ] )
-        .- ( sim.e_y[ begin + 1 : end, begin : end - 1, : ]
-          .- sim.e_y[ begin : end - 1, begin : end - 1, : ] ) )
+    sim.h_y[:] = ( sim.coeff_h_zh .* sim.h_z ) .+ sim.coeff_h_ze .*
+        ( ( sim.e_x[ :, begin + 1 : end, : ] .- sim.e_x[ :, begin : end - 1, : ] )
+        .- ( sim.e_y[ begin + 1 : end, :, : ] .- sim.e_y[ begin : end - 1, :, : ] ) )
+
+    return nothing
 end
 
 """
@@ -188,34 +174,36 @@ end
 function enforce_abc( sim::SimData )
     # x plane 0
     sim.e_y[ begin, :, : ] = sim.abc_xp0_ty .+ abc_coeff * ( sim.e_y[ begin + 1, :, : ] - sim.e_y[ begin, :, : ] )
-    sim.abc_xp0_ty = sim.e_y[ begin + 1, :, : ]
+    sim.abc_xp0_ty[:] = sim.e_y[ begin + 1, :, : ]
     sim.e_z[ begin, :, : ] = sim.abc_xp0_tz .+ abc_coeff * ( sim.e_z[ begin + 1, :, : ] - sim.e_z[ begin, :, : ] )
-    sim.abc_xp0_tz = sim.e_z[ begin + 1, :, : ]
+    sim.abc_xp0_tz[:] = sim.e_z[ begin + 1, :, : ]
     # x plane 1
     sim.e_y[ end, :, : ] = sim.abc_xp1_ty .+ abc_coeff * ( sim.e_y[ end - 1, :, : ] - sim.e_y[ end, :, : ] )
-    sim.abc_xp1_ty = sim.e_y[ end - 1, :, : ]
+    sim.abc_xp1_ty[:] = sim.e_y[ end - 1, :, : ]
     sim.e_z[ end, :, : ] = sim.abc_xp1_tz .+ abc_coeff * ( sim.e_z[ end - 1, :, : ] - sim.e_z[ end, :, : ] )
-    sim.abc_xp1_tz = sim.e_z[ end - 1, :, : ]
+    sim.abc_xp1_tz[:] = sim.e_z[ end - 1, :, : ]
     # y plane 0
     sim.e_x[ :, begin, : ] = sim.abc_yp0_tx .+ abc_coeff * ( sim.e_x[ :, begin + 1, : ] - sim.e_x[ :, begin, : ] )
-    sim.abc_yp0_tx = sim.e_x[ :, begin + 1, : ]
+    sim.abc_yp0_tx[:] = sim.e_x[ :, begin + 1, : ]
     sim.e_z[ :, begin, : ] = sim.abc_yp0_tz .+ abc_coeff * ( sim.e_z[ :, begin + 1, : ] - sim.e_z[ :, begin, : ] )
-    sim.abc_yp0_tz = sim.e_z[ :, begin + 1, : ]
+    sim.abc_yp0_tz[:] = sim.e_z[ :, begin + 1, : ]
     # y plane 1
     sim.e_x[ :, end, : ] = sim.abc_yp1_tx .+ abc_coeff * ( sim.e_x[ :, end - 1, : ] - sim.e_x[ :, end, : ] )
-    sim.abc_yp1_tx = sim.e_x[ :, end - 1, : ]
+    sim.abc_yp1_tx[:] = sim.e_x[ :, end - 1, : ]
     sim.e_z[ :, end, : ] = sim.abc_yp1_tz .+ abc_coeff * ( sim.e_z[ :, end - 1, : ] - sim.e_z[ :, end, : ] )
-    sim.abc_yp1_tz = sim.e_z[ :, end - 1, : ]
+    sim.abc_yp1_tz[:] = sim.e_z[ :, end - 1, : ]
     # z plane 0
     sim.e_x[ :, :, begin ] = sim.abc_zp0_tx .+ abc_coeff * ( sim.e_x[ :, :, begin + 1 ] - sim.e_x[ :, :, begin ] )
-    sim.abc_zp0_tx = sim.e_x[ :, :, begin + 1 ]
+    sim.abc_zp0_tx[:] = sim.e_x[ :, :, begin + 1 ]
     sim.e_y[ :, :, begin ] = sim.abc_zp0_ty .+ abc_coeff * ( sim.e_y[ :, :, begin + 1 ] - sim.e_y[ :, :, begin ] )
-    sim.abc_zp0_ty = sim.e_y[ :, :, begin + 1 ]
+    sim.abc_zp0_ty[:] = sim.e_y[ :, :, begin + 1 ]
     # z plane 1
     sim.e_x[ :, :, end ] = sim.abc_zp1_tx .+ abc_coeff * ( sim.e_x[ :, :, end - 1 ] - sim.e_x[ :, :, end ] )
-    sim.abc_zp1_tx = sim.e_x[ :, :, end - 1 ]
+    sim.abc_zp1_tx[:] = sim.e_x[ :, :, end - 1 ]
     sim.e_y[ :, :, end ] = sim.abc_zp1_ty .+ abc_coeff * ( sim.e_y[ :, :, end - 1 ] - sim.e_y[ :, :, end ] )
-    sim.abc_zp1_ty = sim.e_y[ :, :, end - 1 ]
+    sim.abc_zp1_ty[:] = sim.e_y[ :, :, end - 1 ]
+
+    return nothing
 end
 
 """
@@ -232,6 +220,8 @@ function timestep( sim::SimData )
     # handle any sources here - TODO: before/after abc?
 
     enforce_abc( sim )
+
+    return nothing
 end
 
 """
@@ -244,6 +234,8 @@ function enforce_pec( sim::SimData, regions::Vector{Vector{UnitRange{Int64}}} )
         sim.e_y( region ) .= 0.0
         sim.e_z( region ) .= 0.0
     end
+
+    return nothing
 end
 
 """
@@ -251,6 +243,7 @@ end
         TODO: does this make sense as a function
 """
 function apply_source_node()
+    return nothing
 end
 
 """
@@ -258,6 +251,7 @@ end
         TODO: does this make sense as a function
 """
 function apply_array_nodes()
+    return nothing
 end
 
 # function __init__()
