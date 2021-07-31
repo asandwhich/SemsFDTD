@@ -1,5 +1,6 @@
 
 using Plots
+using WriteVTK
 gr()
 
 include( "SemsFDTD.jl" )
@@ -16,4 +17,4 @@ SemsFDTD.timestep( testsim )
 end
 
 heatmap( testsim.coeff_e_xe[:,:,2], aspect_ratio = 1 )
-
+# vtk_write_array( "test_file_out", rand( 100, 100, 100 )
