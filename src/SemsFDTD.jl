@@ -5,6 +5,14 @@ export approx_stepsize
 export new_sim
 export timestep
 
+
+"""
+general notes
+
+in 2d and 3d, want to operate as close to courant limit as possible
+
+"""
+
 """
     SimData
 
@@ -254,10 +262,49 @@ function apply_array_nodes()
     return nothing
 end
 
-# function __init__()
-#     print( "test" )
-# 
-#     tst = new_sim( 400, 400, 400 )
-# end
+"""
+    gaussian_src -
+
+"""
+function gaussian_src( t::Float64, mean::Float64, σ::Float64 )
+    return exp( -( t - mean )^2 / ( 2 * σ^2 ) ) / ( sqrt( 2 * π ) * σ )
+end
+
+"""
+    gaussian_energy -
+"""
+function gaussian_energy( σ::Float64 )
+    return 1 / ( 2 * σ * sqrt( π ) )
+end
+
+"""
+    gaussian_derivative_src -
+"""
+function guassian_derivative( t::Float64, mean::Float64, σ::Float64 )
+    return -( t - mean ) * exp( -( t - mean )^2 / ( 2 * σ^2 ) ) / ( σ^3 * sqrt( 2 * π ) )
+end
+
+"""
+    gaussian_derivative_energy -
+"""
+function gaussian_derivative_energy( σ::Float64 )
+    return 1 / ( 4 * σ^3 * sqrt( π ) )
+end
+
+"""
+"""
+function quartic_poly_src( t::Float64, duration::Float64 )
+    τ = 1 - 2 * ( t / duration )
+    if abs( τ ) > 1
+        return 0
+    else
+        return ( 1- τ^2 )^4
+    end
+end
+
+function quartic_poly_derivative( t::Float64, duration::Float64 )
+    τ = 1 - 2 * ( t / duration )
+
+end
 
 end # module
