@@ -298,13 +298,26 @@ function quartic_poly_src( t::Float64, duration::Float64 )
     if abs( τ ) > 1
         return 0
     else
-        return ( 1- τ^2 )^4
+        return ( 1 - τ^2 )^4
     end
 end
 
 function quartic_poly_derivative( t::Float64, duration::Float64 )
     τ = 1 - 2 * ( t / duration )
+    if abs( τ ) > 1
+        return 0
+    else
+        return -8 * τ * ( 1 - t^2 )^3
+    end
+end
 
+function quartic_poly_sec_deriv( t::Float64, duration::Float64 )
+    τ = 1 - 2 * ( t / duration )
+    if abs( τ ) > 1
+        return 0
+    else
+        return 48 * τ^2 * ( 1 - τ^2 )^2 - 8 * ( 1 - τ^2 )^3
+    end
 end
 
 end # module

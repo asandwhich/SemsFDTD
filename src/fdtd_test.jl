@@ -5,12 +5,12 @@ gr()
 
 include( "SemsFDTD.jl" )
 
-testsim = SemsFDTD.new_sim( Float16, 400, 400, 50 )
+testsim = SemsFDTD.new_sim( Float32, 1000, 1000, 25 )
 
 SemsFDTD.timestep( testsim )
 
 @time begin
-    for i = 1:5
+    for i = 1:50
         SemsFDTD.timestep( testsim )
         print( ' ', i )
     end
